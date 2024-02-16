@@ -40,7 +40,7 @@ class Agent
         return $this->username;
     }
 
-    public function setUsername(string $username): static
+    public function setUsername(string $username): self
     {
         $this->username = $username;
 
@@ -52,9 +52,9 @@ class Agent
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(string $password): self
     {
-        $this->password = $password;
+        $this->password = $password;  // Ensure to hash the password before setting it
 
         return $this;
     }
@@ -64,7 +64,7 @@ class Agent
         return $this->loginTime;
     }
 
-    public function setLoginTime(?\DateTimeInterface $loginTime): static
+    public function setLoginTime(?\DateTimeInterface $loginTime): self
     {
         $this->loginTime = $loginTime;
 
@@ -76,7 +76,7 @@ class Agent
         return $this->role;
     }
 
-    public function setRole(string $role): static
+    public function setRole(string $role): self
     {
         $this->role = $role;
 
