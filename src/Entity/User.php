@@ -106,7 +106,7 @@ class User implements UserInterface
     public function getUserIdentifier(): string
     {
         // This method is required in Symfony 5.3+ and replaces getUsername in new applications.
-        // If you are implementing UserInterface from Symfony security core, and still use getUsername, ensure compatibility.
+        // If you are implementing UserInterface from Symfony login core, and still use getUsername, ensure compatibility.
         return $this->username;
     }
 }
