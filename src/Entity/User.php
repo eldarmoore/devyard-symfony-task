@@ -30,6 +30,7 @@ class User implements UserInterface
     private ?\DateTimeInterface $loginTime = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Choice(choices: ['USD', 'EUR', 'BTC'])]
     private ?string $currency = null;
 
     public function getId(): ?int
@@ -42,7 +43,7 @@ class User implements UserInterface
         return $this->username;
     }
 
-    public function setUsername(string $username): static
+    public function setUsername(string $username): self
     {
         $this->username = $username;
 

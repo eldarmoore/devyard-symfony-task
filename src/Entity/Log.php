@@ -9,11 +9,6 @@ use Doctrine\DBAL\Types\Types;
 #[ORM\Entity(repositoryClass: LogRepository::class)]
 class Log
 {
-    public function __construct()
-    {
-        $this->dateCreated = new \DateTime();
-    }
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -29,6 +24,11 @@ class Log
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateCreated = null;
 
+    public function __construct()
+    {
+        $this->dateCreated = new \DateTime();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -39,7 +39,7 @@ class Log
         return $this->actionName;
     }
 
-    public function setActionName(string $actionName): static
+    public function setActionName(string $actionName): self
     {
         $this->actionName = $actionName;
 
@@ -63,7 +63,7 @@ class Log
         return $this->dateCreated;
     }
 
-    public function setDateCreated(\DateTimeInterface $dateCreated): static
+    public function setDateCreated(\DateTimeInterface $dateCreated): self
     {
         $this->dateCreated = $dateCreated;
 
