@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Agent;
 use App\Form\UserRegistrationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,20 +17,34 @@ class RegistrationController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
     {
-        $user = new User();
-        $form = $this->createForm(UserRegistrationType::class, $user);
-
+        $form = $this->createForm(UserRegistrationType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Hash the password
-            $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
-            $user->setPassword($hashedPassword);
 
-            // Save the user
-            $entityManager->persist($user);
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $accountType = $form->get('accountType')->getData();
+
+            if ($accountType === 'ROLE_AGENT') {
+                $entity = new Agent();
+                $agentRole = $form->get('agentRole')->getData();
+                $entity->setRole($agentRole);
+            } else {
+                $entity = new User();
+                $currency = $form->get('currency')->getData();
+                $entity->setCurrency($currency);
+            }
+
+            $entity->setUsername($form->get('username')->getData());
+
+            // Hash the password
+            $hashedPassword = $passwordHasher->hashPassword($entity, $form->get('password')->getData());
+            $entity->setPassword($hashedPassword);
+
+            // Save entity
+            $entityManager->persist($entity);
             $entityManager->flush();
 
-            // Redirect or show a success message
+            // Redirect to login page
             return $this->redirectToRoute('login');
         }
 

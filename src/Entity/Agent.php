@@ -6,9 +6,10 @@ use App\Repository\AgentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: AgentRepository::class)]
-class Agent
+class Agent implements UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -81,5 +82,25 @@ class Agent
         $this->role = $role;
 
         return $this;
+    }
+
+    public function getRoles(): array
+    {
+        return [$this->role];
+    }
+
+    public function getSalt(): null
+    {
+        return null;
+    }
+
+    public function eraseCredentials()
+    {
+        // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
     }
 }

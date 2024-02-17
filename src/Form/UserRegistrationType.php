@@ -23,6 +23,24 @@ class UserRegistrationType extends AbstractType
                     'EUR' => 'EUR',
                     'BTC' => 'BTC',
                 ],
+                'mapped' => false,
+            ])
+            ->add('agentRole', ChoiceType::class, [
+                'choices' => [
+                    'Admin' => 'ROLE_ADMIN',
+                    'Representative' => 'ROLE_REP',
+                ],
+                'mapped' => false, // This field does not directly map to an entity property
+                'label' => 'Agent Role',
+                'attr' => ['class' => 'agent-role-selector'],
+            ])
+            ->add('accountType', ChoiceType::class, [
+                'choices' => [
+                    'User' => 'ROLE_USER',
+                    'Agent' => 'ROLE_AGENT',
+                ],
+                'mapped' => false,
+                'label' => 'Account Type',
             ])
             ->add('register', SubmitType::class);
     }

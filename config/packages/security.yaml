@@ -1,19 +1,27 @@
 security:
     enable_authenticator_manager: true
     password_hashers:
-        App\Entity\User: 'auto' # Targeting User entity directly
+        App\Entity\User: 'auto'
+        App\Entity\Agent: 'auto'
     providers:
-        app_user_provider:
+        user_provider:
             entity:
                 class: App\Entity\User
-                property: username # Assuming we use username for login
+                property: username
+        agent_provider:
+            entity:
+                class: App\Entity\Agent
+                property: username
+        chain_provider:
+            chain:
+                providers: [ 'user_provider', 'agent_provider' ]
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: app_user_provider
+            provider: chain_provider
             form_login:
                 login_path: login
                 check_path: login
