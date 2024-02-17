@@ -26,10 +26,12 @@ security:
                 login_path: login
                 check_path: login
                 enable_csrf: true # Ensure CSRF protection is enabled for the login form
+                default_target_path: profile
             logout:
                 path: logout
-                target: homepage # Adjust as necessary
+                target: login
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/profile, roles: [ROLE_USER, ROLE_AGENT] }
         # Secure other paths as necessary

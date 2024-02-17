@@ -86,7 +86,15 @@ class Agent implements UserInterface
 
     public function getRoles(): array
     {
-        return [$this->role];
+        // All agents get the ROLE_AGENT by default
+        $roles = ['ROLE_AGENT'];
+
+        // Add ROLE_ADMIN for agents with the admin type
+        if ($this->getRole() === 'Admin') {
+            $roles[] = 'ROLE_ADMIN';
+        }
+
+        return $roles;
     }
 
     public function getSalt(): null
