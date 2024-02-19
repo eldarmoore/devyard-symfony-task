@@ -37,3 +37,7 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', method: 'onLogoutEvent' }
 
+    App\EventListener\DynamicLoginRedirectListener:
+        arguments: [ '@router' ]
+        tags:
+            - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LoginSuccessEvent', method: 'onLoginSuccess' }

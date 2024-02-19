@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Agent Profile{% endblock %}
+
+{% block body %}
+    <h2>User Profile</h2>
+    <p>Username: {{ username }}</p>
+    <p>Session started at: {{ sessionStartTime|date('Y-m-d H:i:s') }}</p>
+    <p>Remaining session time: {{ remainingLifetime }} seconds</p>
+
+    <!-- Logout Button -->
+    <form action="{{ path('logout') }}" method="get">
+        <button type="submit">Logout</button>
+    </form>
+
+{% endblock %}
