@@ -28,3 +28,12 @@ services:
             $sessionMaxTime: '%session_max_time%'
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+    
+    App\EventListener\LoginListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'security.interactive_login', method: 'onSecurityInteractiveLogin' }
+                
+    App\EventListener\LogoutListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', method: 'onLogoutEvent' }
+

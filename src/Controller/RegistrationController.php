@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Log;
 use App\Entity\User;
 use App\Entity\Agent;
 use App\Form\UserRegistrationType;
@@ -28,10 +29,12 @@ class RegistrationController extends AbstractController
                 $entity = new Agent();
                 $agentRole = $form->get('agentRole')->getData();
                 $entity->setRole($agentRole);
+                $actionName = 'agent_registration';
             } else {
                 $entity = new User();
                 $currency = $form->get('currency')->getData();
                 $entity->setCurrency($currency);
+                $actionName = 'user_registration';
             }
 
             $entity->setUsername($form->get('username')->getData());
@@ -42,6 +45,18 @@ class RegistrationController extends AbstractController
 
             // Save entity
             $entityManager->persist($entity);
+            $entityManager->flush();
+
+            // Log the registration event
+            $log = new Log();
+            $log->setActionName($actionName);
+            $log->setDateCreated(new \DateTime());
+            if ($entity instanceof Agent) {
+                $log->setAgent($entity);
+            } else {
+                $log->setUser($entity);
+            }
+            $entityManager->persist($log);
             $entityManager->flush();
 
             // Redirect to login page

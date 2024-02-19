@@ -17,9 +17,15 @@ class Log
     #[ORM\Column(length: 255)]
     private ?string $actionName = null;
 
+    // Make user relation nullable
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
+
+    // Add agent relation, also nullable
+    #[ORM\ManyToOne(targetEntity: Agent::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Agent $agent = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateCreated = null;
@@ -42,7 +48,18 @@ class Log
     public function setActionName(string $actionName): self
     {
         $this->actionName = $actionName;
+        return $this;
+    }
 
+    // Add getter and setter for Agent
+    public function getAgent(): ?Agent
+    {
+        return $this->agent;
+    }
+
+    public function setAgent(?Agent $agent): self
+    {
+        $this->agent = $agent;
         return $this;
     }
 
@@ -54,7 +71,6 @@ class Log
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -66,7 +82,6 @@ class Log
     public function setDateCreated(\DateTimeInterface $dateCreated): self
     {
         $this->dateCreated = $dateCreated;
-
         return $this;
     }
 }
