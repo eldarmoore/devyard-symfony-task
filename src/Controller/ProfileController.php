@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use App\Entity\User;
@@ -12,7 +13,7 @@ use App\Entity\Agent;
 class ProfileController extends AbstractController
 {
     #[Route('/profile', name: 'profile')]
-    public function index(#[CurrentUser] $user = null): Response
+    public function index(Request $request, #[CurrentUser] $user = null): Response
     {
         if (!$user) {
             $user = $this->getUser();
@@ -27,8 +28,22 @@ class ProfileController extends AbstractController
             throw $this->createAccessDeniedException('No authenticated user or agent.');
         }
 
+        // Assuming session start time is stored at login or session start
+        $sessionStartTime = $request->getSession()->get('session_start_time');
+        if (!$sessionStartTime) {
+            $sessionStartTime = time();
+            $request->getSession()->set('session_start_time', $sessionStartTime);
+        }
+
+        $currentTime = time();
+        $timeElapsed = $currentTime - $sessionStartTime;
+        $sessionMaxTime = $this->getParameter('session_max_time'); // Access the parameter
+        $remainingLifetime = max($sessionMaxTime - $timeElapsed, 0);
+
         return $this->render('profile/index.html.twig', [
-            'username' => $username
+            'username' => $username,
+            'sessionStartTime' => $sessionStartTime,
+            'remainingLifetime' => $remainingLifetime,
         ]);
     }
 }
