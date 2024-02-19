@@ -33,6 +33,9 @@ class User implements UserInterface
     #[Assert\Choice(choices: ['USD', 'EUR', 'BTC'])]
     private ?string $currency = null;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $agentInChargeId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -83,6 +86,17 @@ class User implements UserInterface
     {
         $this->currency = $currency;
 
+        return $this;
+    }
+
+    public function getAgentInChargeId(): ?int
+    {
+        return $this->agentInChargeId;
+    }
+
+    public function setAgentInChargeId(?int $agentInChargeId): self
+    {
+        $this->agentInChargeId = $agentInChargeId;
         return $this;
     }
 
