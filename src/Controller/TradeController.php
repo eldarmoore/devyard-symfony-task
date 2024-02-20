@@ -33,7 +33,6 @@ class TradeController extends AbstractController
 
             $trade->setUser($user); // Assuming the Trade entity has a setUser() method to associate the User entity
 
-
             $currentBidRate = $latestAsset->getBid(); // Assuming this method exists and gets the current bid
 
             // Set the entry rate for the trade to the latest bid rate
@@ -62,6 +61,15 @@ class TradeController extends AbstractController
             $conversionRate = 1; // This should be dynamic based on user's currency
             $usedMargin = $tradeSize * 0.1 * $conversionRate * $currentPrice;
             $trade->setUsedMargin($usedMargin);
+
+            // Set the agent in charge of the user making the trade
+            $agentInCharge = $user->getAgentInCharge();
+            if ($agentInCharge) {
+                $trade->setAgent($agentInCharge);
+            } else {
+                // Handle the case where the current user has no assigned agent
+                throw new \Exception('The current user has no assigned agent');
+            }
 
             // Save trade
             $entityManager->persist($trade);

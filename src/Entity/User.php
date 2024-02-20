@@ -33,8 +33,9 @@ class User implements UserInterface
     #[Assert\Choice(choices: ['USD', 'EUR', 'BTC'])]
     private ?string $currency = null;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $agentInChargeId = null;
+    #[ORM\ManyToOne(targetEntity: Agent::class)]
+    #[ORM\JoinColumn(name: "agent_id", referencedColumnName: "id", nullable: true)]
+    private ?Agent $agentInCharge = null;
 
     public function getId(): ?int
     {
@@ -89,14 +90,14 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getAgentInChargeId(): ?int
+    public function getAgentInCharge(): ?Agent
     {
-        return $this->agentInChargeId;
+        return $this->agentInCharge;
     }
 
-    public function setAgentInChargeId(?int $agentInChargeId): self
+    public function setAgentInCharge(?Agent $agentInCharge): self
     {
-        $this->agentInChargeId = $agentInChargeId;
+        $this->agentInCharge = $agentInCharge;
         return $this;
     }
 
