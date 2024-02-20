@@ -21,6 +21,14 @@ class AssetRepository extends ServiceEntityRepository
         parent::__construct($registry, Asset::class);
     }
 
+    public function findLatest()
+    {
+        return $this->createQueryBuilder('a')
+            ->orderBy('a.dateUpdate', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 //    /**
 //     * @return Asset[] Returns an array of Asset objects
 //     */

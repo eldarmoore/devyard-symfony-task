@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Trade{% endblock %}
+
+{% block body %}
+    <h2>Trade BTC/USD</h2>
+    <p>Latest Bid Rate: {{ latestAsset.bid }}</p>
+
+    {{ form_start(form) }}
+    {{ form_row(form.lotCount) }}
+    {{ form_row(form.position) }}
+    <button type="submit" class="btn btn-primary">Open Trade</button>
+    {{ form_end(form) }}
+{% endblock %}
