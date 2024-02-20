@@ -14,6 +14,9 @@ class Asset
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    private ?string $name = null;
+
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $bid = null;
 
@@ -55,6 +58,18 @@ class Asset
     public function setAsk(string $ask): self
     {
         $this->ask = $ask;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }
