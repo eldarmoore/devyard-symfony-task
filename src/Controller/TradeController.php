@@ -49,7 +49,7 @@ class TradeController extends AbstractController
         $trade->setTradeSize($this->calculateTradeSize($trade,$latestAsset));
         $trade->setStatus('open');
         $trade->setPnl($this->calculatePnl($trade, $latestAsset->getBid(), $userCurrency,$latestAsset));
-        $trade->setUsedMargin($trade->getTradeSize() * 0.1 * $latestAsset->getBid());
+        $trade->setUsedMargin($trade->getTradeSize() * 0.1 * $conversionRate * $latestAsset->getBid());
 
         if (!$agentInCharge = $user->getAgentInCharge()) {
             throw new \Exception('The current user has no assigned agent');

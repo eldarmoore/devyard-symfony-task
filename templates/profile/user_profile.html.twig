@@ -13,4 +13,25 @@
         <button type="submit">Logout</button>
     </form>
 
+    <h3>Open Trade</h3>
+    <h2>Trade BTC/USD</h2>
+    <p>Latest Bid Rate: <span id="latest-bid">{{ latestAsset.bid }}</span></p>
+    <p>Last Updated: <span id="last-updated">{{ latestAsset.dateUpdate|date('Y-m-d H:i:s') }}</span></p> <!-- Adjust date format as needed -->
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-primary">Open Trade</button>
+    {{ form_end(form) }}
+
+    <script>
+        // JavaScript to dynamically update the latest bid rate
+        setInterval(function() {
+            fetch('{{ path('api_latest_bid') }}') // Adjust this path to your route that returns the latest bid rate
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('latest-bid').textContent = data.bid;
+                    document.getElementById('last-updated').innerText = data.dateUpdate; // Update the last-updated element
+                });
+        }, 1000); // Update the rate every 1 second
+    </script>
 {% endblock %}

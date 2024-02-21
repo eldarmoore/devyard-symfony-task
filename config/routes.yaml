@@ -5,3 +5,7 @@
 controllers:
     resource: '../src/Controller/'
     type: annotation
+
+agent_trades:
+    path: /agent-trades
+    controller: App\Controller\AgentProfileController::index

@@ -3,7 +3,7 @@
 {% block title %}Agent Profile{% endblock %}
 
 {% block body %}
-    <h2>User Profile</h2>
+    <h2>Agent Profile</h2>
     <p>Username: {{ username }}</p>
     <p>Session started at: {{ sessionStartTime|date('Y-m-d H:i:s') }}</p>
     <p>Remaining session time: {{ remainingLifetime }} seconds</p>
@@ -13,9 +13,39 @@
         <button type="submit">Logout</button>
     </form>
 
-    {{ form_start(form) }}
-    {{ form_row(form.users) }}
+    <h3>Assign Users</h3>
+    {{ form_start(assignUsersForm) }}
+    {{ form_row(assignUsersForm.users) }}
     <button type="submit" class="btn btn-primary">Assign Selected Users</button>
-    {{ form_end(form) }}
+    {{ form_end(assignUsersForm) }}
 
+    <!-- Trade Form Section -->
+    <h2>Trade BTC/USD</h2>
+    <p>Latest Bid Rate: <span id="latest-bid">{{ latestAsset.bid }}</span></p>
+    <p>Last Updated: <span id="last-updated">{{ latestAsset.dateUpdate|date('Y-m-d H:i:s') }}</span></p> <!-- Adjust date format as needed -->
+
+    <h3>Open Trade</h3>
+    {{ form_start(tradeForm) }}
+    {{ form_row(tradeForm.lotCount) }}
+    {{ form_row(tradeForm.position) }}
+    {% if tradeForm.vars.is_agent|default(false) %}
+        {{ form_row(tradeForm.user) }} {# Render this only if is_agent is true #}
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Open Trade</button>
+    {{ form_end(tradeForm) }}
+
+    <!-- Debug Form Data -->
+    <h3>Debug Form Data</h3>
+    <pre>{{ dump(app.request.request.all()) }}</pre>
+
+    <script>
+        // JavaScript to dynamically update the latest bid rate
+        setInterval(function() {
+            fetch('{{ path('api_latest_bid') }}') // Adjust this path to your route that returns the latest bid rate
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('latest-bid').textContent = data.bid;
+                });
+        }, 1000); // Update the rate every 1 second
+    </script>
 {% endblock %}

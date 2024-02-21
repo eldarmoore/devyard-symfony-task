@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Agent;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,6 +21,14 @@ class UserRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
+    }
+
+    public function findUsersUnderAgent(Agent $agent): QueryBuilder
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.agentInCharge = :agent')
+            ->setParameter('agent', $agent)
+            ->orderBy('u.username', 'ASC');
     }
 
 //    /**

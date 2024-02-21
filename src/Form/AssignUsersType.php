@@ -13,23 +13,27 @@ class AssignUsersType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $agentId = $options['agent_id']; // Assuming this option is passed when creating the form
+
         $builder
             ->add('users', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'username',
-                'multiple' => true, // Allow selection of multiple users
-                'expanded' => false, // Use a select dropdown; set to true for checkboxes
-                'query_builder' => function (EntityRepository $er) {
+                'multiple' => true,
+                'expanded' => false,
+                'query_builder' => function (EntityRepository $er) use ($agentId) {
                     return $er->createQueryBuilder('u')
-                        ->where('u.agentInCharge IS NULL') // Only include users not already assigned to an agent
-                        ->orderBy('u.username', 'ASC');                },
+                        ->where('u.agentInCharge = :agentId')
+                        ->setParameter('agentId', $agentId)
+                        ->orderBy('u.username', 'ASC');
+                },
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            // Configure your default options here
+            'agent_id' => null, // Ensure a default value is set
         ]);
     }
 }
