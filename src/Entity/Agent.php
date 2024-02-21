@@ -31,6 +31,10 @@ class Agent implements UserInterface
     #[Assert\Choice(choices: ['Admin', 'Rep'])]
     private ?string $role = null;
 
+    #[ORM\ManyToOne(targetEntity: Agent::class)]
+    #[ORM\JoinColumn(name: "agent_id", referencedColumnName: "id", nullable: true)]
+    private ?Agent $agentInCharge = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -81,6 +85,17 @@ class Agent implements UserInterface
     {
         $this->role = $role;
 
+        return $this;
+    }
+
+    public function getAgentInCharge(): ?Agent
+    {
+        return $this->agentInCharge;
+    }
+
+    public function setAgentInCharge(?Agent $agentInCharge): self
+    {
+        $this->agentInCharge = $agentInCharge;
         return $this;
     }
 
