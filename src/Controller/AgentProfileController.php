@@ -20,9 +20,7 @@ class AgentProfileController extends AbstractController
             // Redirect to login if there's no authenticated agent
             return $this->redirectToRoute('login');
         }
-
         $username = $agent->getUsername();
-
 
         // Calculate session time details
         $sessionStartTime = $request->getSession()->get('session_start_time', time());
@@ -30,9 +28,24 @@ class AgentProfileController extends AbstractController
         $sessionMaxTime = $this->getParameter('session_max_time');
         $remainingLifetime = max($sessionMaxTime - $timeElapsed, 0);
 
+        // Create Form
         $form = $this->createForm(AssignUsersType::class);
         $form->handleRequest($request);
+        if ($this->handleFormSubmission($form, $entityManager)) {
+            return $this->redirectToRoute('agent_profile');
+        }
 
+        // Render the agent profile template with the full agent entity and session details
+        return $this->render('profile/agent_profile.html.twig', [
+            'username' => $username,
+            'sessionStartTime' => $sessionStartTime,
+            'remainingLifetime' => $remainingLifetime,
+            'form' => $form->createView()
+        ]);
+    }
+
+    private function handleFormSubmission($form, $entityManager): bool
+    {
         if ($form->isSubmitted() && $form->isValid()) {
             $selectedUsers = $form->get('users')->getData(); // Assuming it returns a collection of User entities
 
@@ -45,16 +58,8 @@ class AgentProfileController extends AbstractController
 
             // Add a flash message or any other form of success notification
             $this->addFlash('success', 'Users successfully assigned.');
-
-            return $this->redirectToRoute('agent_profile');
+            return true;
         }
-
-        // Render the agent profile template with the full agent entity and session details
-        return $this->render('profile/agent_profile.html.twig', [
-            'username' => $username,
-            'sessionStartTime' => $sessionStartTime,
-            'remainingLifetime' => $remainingLifetime,
-            'form' => $form->createView()
-        ]);
+        return false;
     }
 }
