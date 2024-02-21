@@ -21,10 +21,12 @@ class TradeController extends AbstractController
         $form->handleRequest($request);
 
         $latestAsset = $assetRepository->findLatest(); // This fetches the latest asset data
+        $assetCurrency = $latestAsset->getName();
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Assume $this->getUser() returns the currently authenticated user
             $user = $this->getUser();
+            $userCurrency = $user->getCurrency();
 
             if (!$user) {
                 // Handle the case where there's no authenticated user
@@ -50,15 +52,20 @@ class TradeController extends AbstractController
 
             // Example PNL calculation
             $entryPrice = $trade->getEntryRate();
+            $lotCount = $trade->getLotCount();
+            $conversionRate = $this->getConversionRate($assetCurrency, $userCurrency);
+
+            // Calculate pip value based on user's currency
+            $pipValue = ($lotSize * $lotCount) * 0.01 * $conversionRate;
+
+            // Adjust PNL calculation using pip value
             if ($trade->getPosition() === 'buy') {
-                $pnl = ($currentPrice - $entryPrice) * $tradeSize;
+                $pnl = ($currentPrice - $entryPrice) * $pipValue * 100;
             } else { // Assuming 'sell'
-                $pnl = ($entryPrice - $currentPrice) * $tradeSize;
+                $pnl = ($entryPrice - $currentPrice) * $pipValue * 100;
             }
             $trade->setPnl($pnl);
 
-            // Assuming you have the conversion rate available
-            $conversionRate = 1; // This should be dynamic based on user's currency
             $usedMargin = $tradeSize * 0.1 * $conversionRate * $currentPrice;
             $trade->setUsedMargin($usedMargin);
 
@@ -84,5 +91,15 @@ class TradeController extends AbstractController
             'form' => $form->createView(),
             'latestAsset' => $latestAsset,
         ]);
+    }
+
+    private function getConversionRate(string $fromCurrency, string $toCurrency): float
+    {
+        // Simplified logic. You might fetch this from an API or define fixed rates.
+        if ($fromCurrency === 'BTCUSDT' && $toCurrency === 'EUR') {
+            return 0.9215; // Example rate
+        }
+        // Default to 1 if no conversion is needed or if the currency pair is not handled
+        return 1;
     }
 }

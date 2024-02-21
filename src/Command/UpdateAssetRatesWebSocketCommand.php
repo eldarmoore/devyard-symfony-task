@@ -33,11 +33,12 @@ class UpdateAssetRatesWebSocketCommand extends Command
                 try {
                     $message = $client->receive();
                     $data = json_decode($message, true);
+                    $name = $data['s']; // No assuming here
                     $bid = $data['b']; // Assuming 'b' is the bid key
                     $ask = $data['a']; // Assuming 'a' is the ask key
 
                     $asset = new Asset();
-                    $asset->setName('BTC/USD');
+                    $asset->setName($name);
                     $asset->setBid($bid);
                     $asset->setAsk($ask);
                     $asset->setDateUpdate(new \DateTime());
