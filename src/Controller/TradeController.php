@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Asset;
 use App\Entity\Trade;
+use App\Entity\User;
 use App\Form\TradeType;
 use App\Repository\AssetRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,80 +19,60 @@ class TradeController extends AbstractController
     public function index(Request $request, EntityManagerInterface $entityManager, AssetRepository $assetRepository): Response
     {
         $trade = new Trade();
+        $latestAsset = $assetRepository->findLatest();
+
         $form = $this->createForm(TradeType::class, $trade);
         $form->handleRequest($request);
 
-        $latestAsset = $assetRepository->findLatest(); // This fetches the latest asset data
-        $assetCurrency = $latestAsset->getName();
-
         if ($form->isSubmitted() && $form->isValid()) {
-            // Assume $this->getUser() returns the currently authenticated user
-            $user = $this->getUser();
-            $userCurrency = $user->getCurrency();
-
-            if (!$user) {
-                // Handle the case where there's no authenticated user
+            if (!$user = $this->getUser()) {
                 throw new \Exception('No authenticated user found');
             }
 
-            $trade->setUser($user); // Assuming the Trade entity has a setUser() method to associate the User entity
-
-            $currentBidRate = $latestAsset->getBid(); // Assuming this method exists and gets the current bid
-
-            // Set the entry rate for the trade to the latest bid rate
-            $trade->setEntryRate($currentBidRate);
-
-            $lotSize = 10; // Fixed lot size
-            $tradeSize = $trade->getLotCount() * $lotSize;
-            $trade->setTradeSize($tradeSize);
-
-            // Set the initial status of the trade to "open"
-            $trade->setStatus('open');
-
-            // Assume $currentPrice is the latest price you fetched from your Asset entity
-            $currentPrice = $latestAsset->getBid(); // or getAsk(), depending on your logic
-
-            // Example PNL calculation
-            $entryPrice = $trade->getEntryRate();
-            $lotCount = $trade->getLotCount();
-            $conversionRate = $this->getConversionRate($assetCurrency, $userCurrency);
-
-            // Calculate pip value based on user's currency
-            $pipValue = ($lotSize * $lotCount) * 0.01 * $conversionRate;
-
-            // Adjust PNL calculation using pip value
-            if ($trade->getPosition() === 'buy') {
-                $pnl = ($currentPrice - $entryPrice) * $pipValue * 100;
-            } else { // Assuming 'sell'
-                $pnl = ($entryPrice - $currentPrice) * $pipValue * 100;
-            }
-            $trade->setPnl($pnl);
-
-            $usedMargin = $tradeSize * 0.1 * $conversionRate * $currentPrice;
-            $trade->setUsedMargin($usedMargin);
-
-            // Set the agent in charge of the user making the trade
-            $agentInCharge = $user->getAgentInCharge();
-            if ($agentInCharge) {
-                $trade->setAgent($agentInCharge);
-            } else {
-                // Handle the case where the current user has no assigned agent
-                throw new \Exception('The current user has no assigned agent');
-            }
-
-            // Save trade
+            $this->handleTradeForm($trade, $latestAsset, $user->getCurrency(), $user);
             $entityManager->persist($trade);
             $entityManager->flush();
 
-            // Redirect or display a confirmation
             return $this->redirectToRoute('user_profile');
         }
-
 
         return $this->render('trade/index.html.twig', [
             'form' => $form->createView(),
             'latestAsset' => $latestAsset,
         ]);
+    }
+
+    private function handleTradeForm(Trade $trade, Asset $latestAsset, string $userCurrency, User $user): void
+    {
+        $trade->setUser($user);
+        $trade->setEntryRate($latestAsset->getBid());
+        $trade->setTradeSize($this->calculateTradeSize($trade,$latestAsset));
+        $trade->setStatus('open');
+        $trade->setPnl($this->calculatePnl($trade, $latestAsset->getBid(), $userCurrency,$latestAsset));
+        $trade->setUsedMargin($trade->getTradeSize() * 0.1 * $latestAsset->getBid());
+
+        if (!$agentInCharge = $user->getAgentInCharge()) {
+            throw new \Exception('The current user has no assigned agent');
+        }
+        $trade->setAgent($agentInCharge);
+    }
+
+    private function calculateTradeSize(Trade $trade, Asset $latestAsset): float
+    {
+        return $trade->getLotCount() * $latestAsset->getLotSize();
+    }
+
+    private function calculatePnl(Trade $trade, string $currentPrice, string $userCurrency, Asset $latestAsset): float
+    {
+        $lotSize = $latestAsset->getLotSize();
+        $entryPrice = $trade->getEntryRate();
+        $lotCount = $trade->getLotCount();
+        $conversionRate = $this->getConversionRate($latestAsset->getName(), $userCurrency);
+        $pipValue = ($lotSize * $lotCount) * 0.01 * $conversionRate;
+
+        return $trade->getPosition() === 'buy'
+            ? ($currentPrice - $entryPrice) * $pipValue * 100
+            : ($entryPrice - $currentPrice) * $pipValue * 100;
     }
 
     private function getConversionRate(string $fromCurrency, string $toCurrency): float

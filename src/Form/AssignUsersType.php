@@ -21,7 +21,7 @@ class AssignUsersType extends AbstractType
                 'expanded' => false, // Use a select dropdown; set to true for checkboxes
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
-                        ->where('u.agentInChargeId IS NULL') // Only include users not already assigned to an agent
+                        ->where('u.agentInCharge IS NULL') // Only include users not already assigned to an agent
                         ->orderBy('u.username', 'ASC');                },
             ]);
     }
