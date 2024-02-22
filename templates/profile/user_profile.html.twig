@@ -3,6 +3,9 @@
 {% block title %}User Profile{% endblock %}
 
 {% block body %}
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="height: 100vh;">
+        <div class="col-md-6">
     <h2>User Profile</h2>
     <p>Username: {{ username }}</p>
     <p>Session started at: {{ sessionStartTime|date('Y-m-d H:i:s') }}</p>
@@ -22,7 +25,9 @@
     {{ form_widget(form) }}
     <button type="submit" class="btn btn-primary">Open Trade</button>
     {{ form_end(form) }}
-
+        </div>
+    </div>
+</div>
     <script>
         setInterval(function() {
             fetch('{{ path('api_latest_bid') }}') // Adjust this path to your route that returns the latest bid rate

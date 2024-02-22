@@ -3,18 +3,22 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
-    <h2>Register</h2>
-    {{ form_start(registrationForm) }}
-    {{ form_row(registrationForm.username) }}
-    {{ form_row(registrationForm.password) }}
-
-    <div id="currencyField" style="display:none;">
-        {{ form_row(registrationForm.currency) }}
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="height: 100vh;">
+            <div class="col-md-6">
+                <h2 class="mb-4">Register</h2>
+                {{ form_start(registrationForm) }}
+                {{ form_row(registrationForm.username, {'attr': {'class': 'form-control mb-3'}}) }}
+                {{ form_row(registrationForm.password, {'attr': {'class': 'form-control mb-3'}}) }}
+                <div id="currencyField" style="display:none;">
+                    {{ form_row(registrationForm.currency, {'attr': {'class': 'form-control mb-3'}}) }}
+                </div>
+                {{ form_row(registrationForm.accountType, {'attr': {'class': 'form-select mb-3'}}) }}
+                {{ form_row(registrationForm.register, {'attr': {'class': 'btn btn-primary'}}) }}
+                {{ form_end(registrationForm) }}
+            </div>
+        </div>
     </div>
-
-    {{ form_row(registrationForm.accountType) }}
-    {{ form_row(registrationForm.register) }}
-    {{ form_end(registrationForm) }}
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
