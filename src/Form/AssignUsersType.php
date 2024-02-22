@@ -13,18 +13,15 @@ class AssignUsersType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $agentId = $options['agent_id']; // Assuming this option is passed when creating the form
-
         $builder
             ->add('users', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'username',
                 'multiple' => true,
                 'expanded' => false,
-                'query_builder' => function (EntityRepository $er) use ($agentId) {
+                'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
-                        ->where('u.agentInCharge = :agentId')
-                        ->setParameter('agentId', $agentId)
+                        ->where('u.agentInCharge IS NULL') // Fetch users without an agent assigned
                         ->orderBy('u.username', 'ASC');
                 },
             ]);
@@ -33,7 +30,7 @@ class AssignUsersType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'agent_id' => null, // Ensure a default value is set
+            // No need to set 'agent_id' option as we're fetching unassigned users
         ]);
     }
 }

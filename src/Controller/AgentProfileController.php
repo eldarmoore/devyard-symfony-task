@@ -19,7 +19,7 @@ use App\Entity\Agent;
 class AgentProfileController extends AbstractController
 {
     #[Route('/agent-profile', name: 'agent_profile')]
-    public function index(Request $request, AssetRepository $assetRepository, TradeService $tradeService, EntityManagerInterface $entityManager, #[CurrentUser] ?Agent $agent): Response
+    public function index(Request $request, AssetRepository $assetRepository, TradeService $tradeService, EntityManagerInterface $entityManager, #[CurrentUser] ?Agent $agent, UserRepository $userRepository): Response
     {
         if (!$agent) {
             return $this->redirectToRoute('login');
@@ -34,9 +34,24 @@ class AgentProfileController extends AbstractController
         // Setup for AssignUsersType form
         $assignUsersForm = $this->createForm(AssignUsersType::class);
         $assignUsersForm->handleRequest($request);
+
         if ($assignUsersForm->isSubmitted() && $assignUsersForm->isValid()) {
-            // Logic to handle form submission, e.g., assigning users to agent
+            $selectedUsers = $assignUsersForm->get('users')->getData(); // Assuming it returns a collection of User entities
+
+            // Get the current agent
+            $currentAgent = $this->getUser();
+
+            foreach ($selectedUsers as $user) {
+                // Assign the current agent to each selected user
+                $user->setAgentInCharge($currentAgent);
+                $entityManager->persist($user);
+            }
+
+            $entityManager->flush();
+
+            // Add a flash message or any other form of success notification
             $this->addFlash('success', 'Users successfully assigned.');
+
             return $this->redirectToRoute('agent_profile');
         }
 
@@ -62,6 +77,15 @@ class AgentProfileController extends AbstractController
             return $this->redirectToRoute('agent_trades');
         }
 
+        // Retrieve users without an agent assigned to them
+        $usersWithoutAgent = $userRepository->findBy(['agentInCharge' => null]);
+
+        // Retrieve users assigned to the agent
+        $usersWithAgent = $userRepository->findBy(['agentInCharge' => $agent]);
+
+        // Merge both sets of users
+        $users = array_merge($usersWithoutAgent, $usersWithAgent);
+
         $latestAsset = $assetRepository->findLatest();
 
         return $this->render('profile/agent_profile.html.twig', [
@@ -71,6 +95,8 @@ class AgentProfileController extends AbstractController
             'assignUsersForm' => $assignUsersForm->createView(),
             'tradeForm' => $tradeForm->createView(),
             'latestAsset' => $latestAsset,
+            'assignedUsers' => $usersWithAgent,
+            'unassignedUsers' => $usersWithoutAgent,
         ]);
     }
 }

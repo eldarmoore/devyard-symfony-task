@@ -29,14 +29,33 @@
     {{ form_row(tradeForm.lotCount) }}
     {{ form_row(tradeForm.position) }}
     {% if tradeForm.vars.is_agent|default(false) %}
-        {{ form_row(tradeForm.user) }} {# Render this only if is_agent is true #}
+        {{ form_row(tradeForm.unassignedUsers) }} {# Render this only if is_agent is true #}
     {% endif %}
     <button type="submit" class="btn btn-primary">Open Trade</button>
     {{ form_end(tradeForm) }}
 
-    <!-- Debug Form Data -->
-    <h3>Debug Form Data</h3>
-    <pre>{{ dump(app.request.request.all()) }}</pre>
+    <h3>Users Assigned to Agent</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Login Time</th>
+            <th>Agent ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in assignedUsers %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.loginTime|date('Y-m-d H:i:s') }}</td>
+                <td>{{ user.agentInCharge.id }}</td>
+
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
     <script>
         // JavaScript to dynamically update the latest bid rate
@@ -45,6 +64,7 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('latest-bid').textContent = data.bid;
+                    document.getElementById('last-updated').innerText = data.dateUpdate; // Update the last-updated element
                 });
         }, 1000); // Update the rate every 1 second
     </script>
