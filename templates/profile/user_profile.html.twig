@@ -6,7 +6,7 @@
     <h2>User Profile</h2>
     <p>Username: {{ username }}</p>
     <p>Session started at: {{ sessionStartTime|date('Y-m-d H:i:s') }}</p>
-    <p>Remaining session time: {{ remainingLifetime }} seconds</p>
+    <p>Remaining session time: <span id="remaining-time">{{ remainingLifetime | date('i:s') }}</span></p>
 
     <!-- Logout Button -->
     <form action="{{ path('logout') }}" method="get">
@@ -24,7 +24,6 @@
     {{ form_end(form) }}
 
     <script>
-        // JavaScript to dynamically update the latest bid rate
         setInterval(function() {
             fetch('{{ path('api_latest_bid') }}') // Adjust this path to your route that returns the latest bid rate
                 .then(response => response.json())
@@ -32,6 +31,36 @@
                     document.getElementById('latest-bid').textContent = data.bid;
                     document.getElementById('last-updated').innerText = data.dateUpdate; // Update the last-updated element
                 });
+
+            // Retrieve session start init time and calculate remaining time
+            let remainingInitTimeText = document.getElementById('remaining-time').innerText;
+            let remainingInitTime = remainingInitTimeText.split(':');
+            let currentCount = parseInt(remainingInitTime[0]) * 60 + parseInt(remainingInitTime[1]);
+
+            // Decrease the remaining time by 1 second
+            currentCount -= 1;
+
+            // Calculate remaining minutes and seconds
+            let remainingMinutes = Math.floor(currentCount / 60);
+            let remainingSeconds = currentCount % 60;
+
+            // Ensure minutes and seconds are displayed with leading zeros if necessary
+            let formattedMinutes = remainingMinutes < 10 ? '0' + remainingMinutes : remainingMinutes;
+            let formattedSeconds = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+
+            // Update remaining time display
+            document.getElementById('remaining-time').textContent = formattedMinutes + ':' + formattedSeconds;
+
+            // Function to redirect to logout page if session expires
+            function redirectIfSessionExpired(timeLeft) {
+                if (timeLeft <= 0) {
+                    window.location.href = '{{ path('logout') }}';
+                }
+            }
+
+            // Call the redirect function if remaining time is less than or equal to 0
+            redirectIfSessionExpired(currentCount);
         }, 1000); // Update the rate every 1 second
+    </script>
     </script>
 {% endblock %}

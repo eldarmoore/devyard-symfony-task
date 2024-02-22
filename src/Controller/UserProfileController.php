@@ -42,8 +42,13 @@ class UserProfileController extends AbstractController
             return $this->redirectToRoute('user_profile'); // Adjust route as necessary
         }
 
+        if (!$request->getSession()->has('session_start_time')) {
+            // Set the session start time only if it's not already set
+            $request->getSession()->set('session_start_time', time());
+        }
+
         // Session time details for displaying session duration
-        $sessionStartTime = $request->getSession()->get('session_start_time', time());
+        $sessionStartTime = $request->getSession()->get('session_start_time');
         $timeElapsed = time() - $sessionStartTime;
         $sessionMaxTime = $this->getParameter('session_max_time');
         $remainingLifetime = max($sessionMaxTime - $timeElapsed, 0);
@@ -53,6 +58,7 @@ class UserProfileController extends AbstractController
             'form' => $form->createView(),
             'latestAsset' => $latestAsset,
             'sessionStartTime' => $sessionStartTime,
+            'sessionMaxTime' => $sessionMaxTime,
             'remainingLifetime' => $remainingLifetime,
         ]);
     }

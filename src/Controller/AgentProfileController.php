@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use App\Entity\Agent;
@@ -19,17 +20,16 @@ use App\Entity\Agent;
 class AgentProfileController extends AbstractController
 {
     #[Route('/agent-profile', name: 'agent_profile')]
-    public function index(Request $request, AssetRepository $assetRepository, TradeService $tradeService, EntityManagerInterface $entityManager, #[CurrentUser] ?Agent $agent, UserRepository $userRepository): Response
+    public function index(Request $request, AssetRepository $assetRepository, TradeService $tradeService, EntityManagerInterface $entityManager, #[CurrentUser] ?Agent $agent, UserRepository $userRepository, SessionInterface $session): Response
     {
         if (!$agent) {
             return $this->redirectToRoute('login');
         }
 
-        // Define the missing variables
-        $username = $agent->getUsername(); // Assuming Agent entity has getUsername method
-        $sessionStartTime = $request->getSession()->get('session_start_time', new \DateTime());
-        $currentTime = new \DateTime();
-        $remainingLifetime = $sessionStartTime->diff($currentTime)->format('%i minutes %s seconds');
+        // Check if the session start time is not set, then set it
+        if (!$session->has('session_start_time')) {
+            $session->set('session_start_time', time());
+        }
 
         // Setup for AssignUsersType form
         $assignUsersForm = $this->createForm(AssignUsersType::class);
@@ -83,14 +83,21 @@ class AgentProfileController extends AbstractController
         // Retrieve users assigned to the agent
         $usersWithAgent = $userRepository->findBy(['agentInCharge' => $agent]);
 
-        // Merge both sets of users
-        $users = array_merge($usersWithoutAgent, $usersWithAgent);
-
         $latestAsset = $assetRepository->findLatest();
+
+        // Define the missing variables
+        $username = $agent->getUsername(); // Assuming Agent entity has getUsername method
+
+        // Session time details for displaying session duration
+        $sessionStartTime = $request->getSession()->get('session_start_time');
+        $timeElapsed = time() - $sessionStartTime;
+        $sessionMaxTime = $this->getParameter('session_max_time');
+        $remainingLifetime = max($sessionMaxTime - $timeElapsed, 0);
 
         return $this->render('profile/agent_profile.html.twig', [
             'username' => $username,
-            'sessionStartTime' => $sessionStartTime->format('Y-m-d H:i:s'),
+            'sessionStartTime' => $sessionStartTime,
+            'sessionMaxTime' => $sessionMaxTime,
             'remainingLifetime' => $remainingLifetime,
             'assignUsersForm' => $assignUsersForm->createView(),
             'tradeForm' => $tradeForm->createView(),
