@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Trade;
 use App\Form\AssignUsersType;
 use App\Form\TradeType;
+use App\Repository\AgentRepository;
 use App\Repository\AssetRepository;
 use App\Repository\UserRepository; // Ensure this is added if you need to query users
 use App\Service\TradeService;
@@ -20,7 +21,7 @@ use App\Entity\Agent;
 class AgentProfileController extends AbstractController
 {
     #[Route('/agent-profile', name: 'agent_profile')]
-    public function index(Request $request, AssetRepository $assetRepository, TradeService $tradeService, EntityManagerInterface $entityManager, #[CurrentUser] ?Agent $agent, UserRepository $userRepository, SessionInterface $session): Response
+    public function index(Request $request, AssetRepository $assetRepository, TradeService $tradeService, EntityManagerInterface $entityManager, #[CurrentUser] ?Agent $agent, UserRepository $userRepository, AgentRepository $agentRepository, SessionInterface $session): Response
     {
         if (!$agent) {
             return $this->redirectToRoute('login');
@@ -83,6 +84,8 @@ class AgentProfileController extends AbstractController
         // Retrieve users assigned to the agent
         $usersWithAgent = $userRepository->findBy(['agentInCharge' => $agent]);
 
+        $agentsWithAgent = $agentRepository->findBy(['agentInCharge' => $agent]);
+
         $latestAsset = $assetRepository->findLatest();
 
         // Define the missing variables
@@ -103,6 +106,7 @@ class AgentProfileController extends AbstractController
             'tradeForm' => $tradeForm->createView(),
             'latestAsset' => $latestAsset,
             'assignedUsers' => $usersWithAgent,
+            'assignedAgents' => $agentsWithAgent,
             'unassignedUsers' => $usersWithoutAgent,
         ]);
     }

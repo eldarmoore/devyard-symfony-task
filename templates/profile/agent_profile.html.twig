@@ -57,6 +57,28 @@
         </tbody>
     </table>
 
+    <h3>Assigned Agents To This Agent</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Login Time</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for agent in assignedAgents %}
+            <tr>
+                <td>{{ agent.id }}</td>
+                <td>{{ agent.username }}</td>
+                <td>{{ agent.loginTime|date('Y-m-d H:i:s') }}</td>
+                <td>{{ agent.agentInCharge.id }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
     <script>
         setInterval(function() {
             fetch('{{ path('api_latest_bid') }}') // Adjust this path to your route that returns the latest bid rate
