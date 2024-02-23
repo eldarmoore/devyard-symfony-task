@@ -25,7 +25,7 @@ class TradeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('lot_count', NumberType::class, [
+            ->add('lotCount', NumberType::class, [
                 'label' => 'Lot count',
                 'html5' => true, // Ensure HTML5 input type attributes are used
                 'attr' => [
