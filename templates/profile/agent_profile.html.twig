@@ -39,6 +39,16 @@
                         </div>
 
                         <div class="card mt-4">
+                            <h5 class="card-header">Assign Agents</h5>
+                            <div class="card-body">
+                                {{ form_start(assignAgentsForm) }}
+                                {{ form_row(assignAgentsForm.agents) }}
+                                <button type="submit" class="btn btn-primary">Assign Selected Agent</button>
+                                {{ form_end(assignAgentsForm) }}
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
                             <h5 class="card-header">Open Trade</h5>
                             <div class="card-body">
                                 <h2>Trade BTC/USD</h2>
