@@ -3,31 +3,54 @@
 {% block title %}User Profile{% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="row justify-content-center align-items-center" style="height: 100vh;">
-        <div class="col-md-6">
-    <h2>User Profile</h2>
-    <p>Username: {{ username }}</p>
-    <p>Session started at: {{ sessionStartTime|date('Y-m-d H:i:s') }}</p>
-    <p>Remaining session time: <span id="remaining-time">{{ remainingLifetime | date('i:s') }}</span></p>
-
-    <!-- Logout Button -->
-    <form action="{{ path('logout') }}" method="get">
-        <button type="submit">Logout</button>
-    </form>
-
-    <h3>Open Trade</h3>
-    <h2>Trade BTC/USD</h2>
-    <p>Latest Bid Rate: <span id="latest-bid">{{ latestAsset.bid }}</span></p>
-    <p>Last Updated: <span id="last-updated">{{ latestAsset.dateUpdate|date('Y-m-d H:i:s') }}</span></p> <!-- Adjust date format as needed -->
-
-    {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button type="submit" class="btn btn-primary">Open Trade</button>
-    {{ form_end(form) }}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <span class="navbar-brand">Welcome {{ username }}</span>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center"> <!-- Add Bootstrap classes here -->
+                    <li class="nav-item me-3"> <!-- Add the Bootstrap margin class here -->
+                        <span class="mb-0 dropdown-item-text">Remaining session time: <span id="remaining-time">{{ remainingLifetime | date('i:s') }}</span></span>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Replace the link with a form and a button -->
+                        <form action="{{ path('logout') }}" method="get">
+                            <button class="btn btn-dark" type="submit">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-md-6">
+                    <div class="text-center">
+
+                        <div class="card mt-4">
+                            <h5 class="card-header">Open Trade</h5>
+                            <div class="card-body">
+                                <h2>Trade BTC/USD</h2>
+                                <span>Latest Bid Rate: <span id="latest-bid">{{ latestAsset.bid }}</span></span>
+                                <span>Last Updated: <span id="last-updated">{{ latestAsset.dateUpdate|date('Y-m-d H:i:s') }}</span></span> <!-- Adjust date format as needed -->
+                                <div class="card mt-3">
+                                    <div class="card-body">
+                                        {{ form_start(form, {'attr': {'class': 'form-group'}}) }}
+                                        {{ form_widget(form) }}
+                                        <button type="submit" class="btn btn-primary mt-3">Open Trade</button>
+                                        {{ form_end(form) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
     <script>
         setInterval(function() {
             fetch('{{ path('api_latest_bid') }}') // Adjust this path to your route that returns the latest bid rate
