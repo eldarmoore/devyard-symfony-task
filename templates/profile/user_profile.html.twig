@@ -7,12 +7,12 @@
         <div class="container">
             <span class="navbar-brand">Welcome {{ username }}</span>
             <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center"> <!-- Add Bootstrap classes here -->
-                    <li class="nav-item me-3"> <!-- Add the Bootstrap margin class here -->
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
+                    <li class="nav-item me-3">
                         <span class="mb-0 dropdown-item-text">Remaining session time: <span id="remaining-time">{{ remainingLifetime | date('i:s') }}</span></span>
                     </li>
                     <li class="nav-item">
-                        <!-- Replace the link with a form and a button -->
+
                         <form action="{{ path('logout') }}" method="get">
                             <button class="btn btn-dark" type="submit">Logout</button>
                         </form>
@@ -32,8 +32,8 @@
                             <h5 class="card-header">Open Trade</h5>
                             <div class="card-body">
                                 <h2>Trade BTC/USD</h2>
-                                <span>Latest Bid Rate: <span id="latest-bid">{{ latestAsset.bid }}</span></span>
-                                <span>Last Updated: <span id="last-updated">{{ latestAsset.dateUpdate|date('Y-m-d H:i:s') }}</span></span> <!-- Adjust date format as needed -->
+                                <p>Latest Bid Rate: <span id="latest-bid">{{ latestAsset.bid }}</span></p>
+                                <p>Last Updated: <span id="last-updated">{{ latestAsset.dateUpdate|date('Y-m-d H:i:s') }}</span></p> <!-- Adjust date format as needed -->
                                 <div class="card mt-3">
                                     <div class="card-body">
                                         {{ form_start(form, {'attr': {'class': 'form-group'}}) }}
@@ -89,6 +89,5 @@
             // Call the redirect function if remaining time is less than or equal to 0
             redirectIfSessionExpired(currentCount);
         }, 1000); // Update the rate every 1 second
-    </script>
     </script>
 {% endblock %}
