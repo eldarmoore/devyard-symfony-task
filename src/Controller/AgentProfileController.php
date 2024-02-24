@@ -8,6 +8,7 @@ use App\Form\TradeType;
 use App\Repository\AgentRepository;
 use App\Repository\AssetRepository;
 use App\Repository\UserRepository; // Ensure this is added if you need to query users
+use App\Service\LoggingService;
 use App\Service\TradeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +21,13 @@ use App\Entity\Agent;
 
 class AgentProfileController extends AbstractController
 {
+    private LoggingService $loggingService;
+
+    public function __construct(LoggingService $loggingService)
+    {
+        $this->loggingService = $loggingService;
+    }
+
     #[Route('/agent-profile', name: 'agent_profile')]
     public function index(Request $request, AssetRepository $assetRepository, TradeService $tradeService, EntityManagerInterface $entityManager, #[CurrentUser] ?Agent $agent, UserRepository $userRepository, AgentRepository $agentRepository, SessionInterface $session): Response
     {
@@ -52,6 +60,9 @@ class AgentProfileController extends AbstractController
 
             // Add a flash message or any other form of success notification
             $this->addFlash('success', 'Users successfully assigned.');
+
+            // Add to Log
+            $this->loggingService->logUserAssignment($currentAgent);
 
             return $this->redirectToRoute('agent_profile');
         }

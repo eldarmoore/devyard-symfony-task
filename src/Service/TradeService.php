@@ -10,10 +10,12 @@ use Doctrine\ORM\EntityManagerInterface;
 class TradeService
 {
     private EntityManagerInterface $entityManager;
+    private LoggingService $loggingService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, LoggingService $loggingService)
     {
         $this->entityManager = $entityManager;
+        $this->loggingService = $loggingService;
     }
 
     public function handleTrade(Trade $trade, Asset $latestAsset, string $userCurrency, User $user): void
@@ -40,6 +42,9 @@ class TradeService
         // Persist and flush the trade entity
         $this->entityManager->persist($trade);
         $this->entityManager->flush();
+
+        // Log the trade creation
+        $this->loggingService->logTradeCreation($user);
     }
 
     private function calculateTradeSize(Trade $trade): float
