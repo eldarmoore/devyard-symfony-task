@@ -28,7 +28,7 @@ class UserProfileController extends AbstractController
         // Create and handle the form for a new trade
         $trade = new Trade();
         $form = $this->createForm(TradeType::class, $trade, [
-            'user_currency' => $user->getCurrency(), // Pass the user's currency as an option to the form
+            'user_currency' => $user->getCurrency(),
         ]);
         $form->handleRequest($request);
 
@@ -39,7 +39,7 @@ class UserProfileController extends AbstractController
             }
 
             $tradeService->handleTrade($trade, $latestAsset, $user->getCurrency(), $user);
-            return $this->redirectToRoute('user_profile'); // Adjust route as necessary
+            return $this->redirectToRoute('user_profile');
         }
 
         if (!$request->getSession()->has('session_start_time')) {

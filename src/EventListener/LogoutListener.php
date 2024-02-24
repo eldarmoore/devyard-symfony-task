@@ -19,6 +19,7 @@ class LogoutListener
 
     public function onLogoutEvent(LogoutEvent $event)
     {
+        // This listener currently is not working
         $entity = $event->getToken()->getUser();
 
         if ($entity) {

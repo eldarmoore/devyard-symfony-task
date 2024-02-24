@@ -73,7 +73,7 @@ class TradeService
         $conversionRate = $this->getConversionRate($userCurrency);
 
         // Get the bid currency price and convert it to the user's currency
-        $bidCurrencyPrice = $latestAsset->getBid(); // Assuming this returns the bid price in the bid currency
+        $bidCurrencyPrice = $latestAsset->getBid();
         $bidCurrencyToUserCurrency = $bidCurrencyPrice * $conversionRate;
 
         return $tradeSize * $marginRate * $bidCurrencyToUserCurrency;
@@ -82,12 +82,11 @@ class TradeService
     private function getConversionRate(string $userCurrency): float
     {
         if ($userCurrency === 'USD') {
-            return 1.0; // No conversion needed
+            return 1.0; // No conversion
         } elseif ($userCurrency === 'EUR') {
             return 0.9215; // USD to EUR conversion rate
         } else {
-            // Handle other currencies if needed
-            return 1.0; // Default to no conversion
+            return 1.0;
         }
     }
 }
