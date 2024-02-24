@@ -20,7 +20,6 @@ class LoggingService
         $log = new Log();
         $log->setActionName('Trade created');
         $log->setUser($user);
-        // Set other relevant fields
 
         // Persist the log entity
         $this->entityManager->persist($log);
@@ -33,12 +32,10 @@ class LoggingService
         $log = new Log();
         $log->setActionName('User assigned to agent');
         $log->setAgent($agent);
-        // Set other relevant fields
 
         // Persist the log entity
         $this->entityManager->persist($log);
         $this->entityManager->flush();
     }
 
-    // Add more log action methods as needed
 }

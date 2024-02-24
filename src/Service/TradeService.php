@@ -49,19 +49,16 @@ class TradeService
 
     private function calculateTradeSize(Trade $trade): float
     {
-        // Assuming lot size is a constant value or retrieved from the trade/asset
-        $lotSize = 10; // This can be dynamic if needed
+        $lotSize = 10;
         return $trade->getLotCount() * $lotSize;
     }
 
     private function calculatePnl(Trade $trade, Asset $latestAsset, string $userCurrency): float
     {
-        // Simplified PNL calculation
-        // This method should include currency conversion if the user currency differs from the asset currency
-        $currentPrice = $latestAsset->getBid(); // or getAsk(), depending on trade position
+        $currentPrice = $latestAsset->getBid();
         $entryPrice = $trade->getEntryRate();
         $tradeSize = $trade->getTradeSize();
-        $conversionRate = $this->getConversionRate($userCurrency); // Implement this method based on your conversion logic
+        $conversionRate = $this->getConversionRate($userCurrency);
 
         if ($trade->getPosition() === 'buy') {
             return ($currentPrice - $entryPrice) * $tradeSize * $conversionRate;
@@ -72,16 +69,25 @@ class TradeService
 
     private function calculateUsedMargin(float $tradeSize, Asset $latestAsset, string $userCurrency): float
     {
-        // Example calculation, adjust as necessary
-        $marginRate = 0.1; // Example margin rate
-        $conversionRate = $this->getConversionRate($userCurrency); // Implement this method
-        return $tradeSize * $marginRate * $conversionRate;
+        $marginRate = 0.1;
+        $conversionRate = $this->getConversionRate($userCurrency);
+
+        // Get the bid currency price and convert it to the user's currency
+        $bidCurrencyPrice = $latestAsset->getBid(); // Assuming this returns the bid price in the bid currency
+        $bidCurrencyToUserCurrency = $bidCurrencyPrice * $conversionRate;
+
+        return $tradeSize * $marginRate * $bidCurrencyToUserCurrency;
     }
 
     private function getConversionRate(string $userCurrency): float
     {
-        // Implement currency conversion logic here
-        // Return 1 if no conversion is needed or if user currency matches asset currency
-        return 1.0;
+        if ($userCurrency === 'USD') {
+            return 1.0; // No conversion needed
+        } elseif ($userCurrency === 'EUR') {
+            return 0.9215; // USD to EUR conversion rate
+        } else {
+            // Handle other currencies if needed
+            return 1.0; // Default to no conversion
+        }
     }
 }
