@@ -42,8 +42,12 @@
                             <h5 class="card-header">Open Trade</h5>
                             <div class="card-body">
                                 <h2>Trade BTC/USD</h2>
-                                <p>Latest Bid Rate: <span id="latest-bid">{{ latestAsset.bid }}</span></p>
-                                <p>Last Updated: <span id="last-updated">{{ latestAsset.dateUpdate|date('Y-m-d H:i:s') }}</span></p>
+                                {% if latestAsset is defined and latestAsset is not null %}
+                                    <p>Latest Bid Rate: <span id="latest-bid">{{ latestAsset.bid }}</span></p>
+                                    <p>Last Updated: <span id="last-updated">{{ latestAsset.dateUpdate|date('Y-m-d H:i:s') }}</span></p>
+                                {% else %}
+                                    <p>No latest asset found.</p>
+                                {% endif %}
 
                                 {{ form_start(tradeForm) }}
                                 {{ form_row(tradeForm.lotCount) }}
