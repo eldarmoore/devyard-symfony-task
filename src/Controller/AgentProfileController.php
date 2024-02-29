@@ -125,20 +125,18 @@ class AgentProfileController extends AbstractController
     {
         $assignAgentsForm = $this->createForm(AssignAgentsType::class);
         $assignAgentsForm->handleRequest($request);
+        $currentAgent = $this->getUser();
+
         if ($assignAgentsForm->isSubmitted() && $assignAgentsForm->isValid()) {
             $selectedAgents = $assignAgentsForm->get('agents')->getData();
-            $currentAgent = $this->getUser();
-            foreach ($selectedAgents as $agent) {
-                // Detach the agent from the entity manager's persistence context
-                $entityManager->detach($agent);
 
-                // Assign the current agent as the agentInCharge for each selected agent
+            foreach($selectedAgents as $agent) {
                 $agent->setAgentInCharge($currentAgent);
-
-                // Persist the updated agent
                 $entityManager->persist($agent);
             }
+
             $entityManager->flush();
+
             // Add a flash message or any other form of success notification
             $this->addFlash('success', 'Agents successfully assigned.');
         }

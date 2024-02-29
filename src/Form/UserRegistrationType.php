@@ -26,10 +26,7 @@ class UserRegistrationType extends AbstractType
                 'mapped' => false,
             ])
             ->add('agentRole', ChoiceType::class, [
-                'choices' => [
-                    'Admin' => 'ROLE_ADMIN',
-                    'Representative' => 'ROLE_REP',
-                ],
+                'choices' => ['ROLE_ADMIN','ROLE_REP'],
                 'mapped' => false, // This field does not directly map to an entity property
                 'label' => 'Agent Role',
                 'attr' => ['class' => 'agent-role-selector'],

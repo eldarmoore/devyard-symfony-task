@@ -28,7 +28,7 @@ class Agent implements UserInterface
     private ?\DateTimeInterface $loginTime = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\Choice(choices: ['Admin', 'Rep'])]
+    #[Assert\Choice(choices: ['ROLE_ADMIN', 'ROLE_REP'])]
     private ?string $role = null;
 
     #[ORM\ManyToOne(targetEntity: Agent::class)]
